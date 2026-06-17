@@ -1,0 +1,126 @@
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+
+const UNITS = ['pièce', 'litre', 'mètre', 'kg', 'gramme', 'boîte', 'pack', 'sachet', 'carton', 'heure', 'jour', 'mois', 'service', 'portion']
+
+export default function Products() {
+  const [products, setProducts] = useState([])
+  const [newProd, setNewProd] = useState({ name: '', unit: 'pièce', purchase_price: '', sale_price: '', stock: '' })
+  const [error, setError] = useState(null)
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({})
+
+  const headers = { Authorization: 'Bearer placeholder' }
+  const API = 'http://localhost:5000/api'
+
+  async function load() {
+    const res = await axios.get(`${API}/products`, { headers })
+    setProducts(res.data)
+  }
+
+  async function addProduct() {
+    if (!newProd.name) { setError('Nom requis'); return }
+    await axios.post(`${API}/products`, newProd, { headers })
+    setNewProd({ name: '', unit: 'pièce', purchase_price: '', sale_price: '', stock: '' })
+    setError(null)
+    load()
+  }
+
+  async function deleteProduct(id) {
+    await axios.delete(`${API}/products/${id}`, { headers })
+    load()
+  }
+
+  function startEdit(p) {
+    setEditingId(p.id)
+    setEditForm({ name: p.name, unit: p.unit, purchase_price: String(p.purchase_price), sale_price: String(p.sale_price), stock: String(p.stock) })
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditForm({})
+  }
+
+  async function saveEdit(id) {
+    await axios.put(`${API}/products/${id}`, editForm, { headers })
+    setEditingId(null)
+    setEditForm({})
+    load()
+  }
+
+  useEffect(() => { load() }, [])
+
+  return (
+    <div className="page">
+      <h1>Gestion des produits</h1>
+
+      <div className="card form-card">
+        <h3>Ajouter un produit</h3>
+        {error && <div className="error">{error}</div>}
+        <div className="row wrap">
+          <input placeholder="Nom" value={newProd.name} onChange={e => setNewProd({ ...newProd, name: e.target.value })} />
+          <input list="unit-list" placeholder="Unité" value={newProd.unit} onChange={e => setNewProd({ ...newProd, unit: e.target.value })} />
+          <datalist id="unit-list">
+            {UNITS.map(u => <option key={u} value={u} />)}
+          </datalist>
+          <input placeholder="Prix achat" type="number" step="0.01" value={newProd.purchase_price} onChange={e => setNewProd({ ...newProd, purchase_price: e.target.value })} />
+          <input placeholder="Prix vente" type="number" step="0.01" value={newProd.sale_price} onChange={e => setNewProd({ ...newProd, sale_price: e.target.value })} />
+          <input placeholder="Stock" type="number" value={newProd.stock} onChange={e => setNewProd({ ...newProd, stock: e.target.value })} />
+          <button onClick={addProduct}>Ajouter</button>
+        </div>
+      </div>
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Unité</th>
+            <th>Prix achat</th>
+            <th>Prix vente</th>
+            <th>Stock</th>
+            <th>Vendus</th>
+            <th>Bénéfice/unité</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map(p => (
+            <tr key={p.id}>
+              {editingId === p.id ? (
+                <>
+                  <td><input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} /></td>
+                  <td>
+                    <input list="unit-list" value={editForm.unit} onChange={e => setEditForm({ ...editForm, unit: e.target.value })} />
+                  </td>
+                  <td><input type="number" step="0.01" value={editForm.purchase_price} onChange={e => setEditForm({ ...editForm, purchase_price: e.target.value })} /></td>
+                  <td><input type="number" step="0.01" value={editForm.sale_price} onChange={e => setEditForm({ ...editForm, sale_price: e.target.value })} /></td>
+                  <td><input type="number" value={editForm.stock} onChange={e => setEditForm({ ...editForm, stock: e.target.value })} /></td>
+                  <td>{p.sold}</td>
+                  <td>{Number(editForm.sale_price) - Number(editForm.purchase_price)} €</td>
+                  <td>
+                    <button onClick={() => saveEdit(p.id)}>Sauvegarder</button>
+                    <button className="btn-secondary" onClick={cancelEdit}>Annuler</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td>{p.name}</td>
+                  <td>{p.unit || 'pièce'}</td>
+                  <td>{p.purchase_price} €</td>
+                  <td>{p.sale_price} €</td>
+                  <td>{p.stock}</td>
+                  <td>{p.sold}</td>
+                  <td>{p.sale_price - p.purchase_price} €</td>
+                  <td>
+                    <button onClick={() => startEdit(p)}>Modifier</button>
+                    <button className="btn-danger" onClick={() => deleteProduct(p.id)}>Supprimer</button>
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
