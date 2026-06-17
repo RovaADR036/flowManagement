@@ -240,6 +240,19 @@ export default function Sales() {
           </ol>
         </aside>
       </div>
+      {/* Today's profit footer */}
+      {(() => {
+        const today = new Date().toISOString().slice(0, 10)
+        const todayProfit = sales
+          .filter(s => s.date && s.date.startsWith(today))
+          .reduce((sum, s) => sum + s.profit, 0)
+        return (
+          <div className="profit-footer">
+            <span className="profit-label">💰 Bénéfice du jour</span>
+            <span className="profit-value">{todayProfit.toFixed(2)} Ar</span>
+          </div>
+        )
+      })()}
     </div>
   )
 }

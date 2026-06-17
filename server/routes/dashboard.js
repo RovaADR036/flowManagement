@@ -23,7 +23,7 @@ router.get('/dashboard', ensureAuth, (req, res) => {
   const stockRow = db.prepare('SELECT COALESCE(SUM(stock * purchase_price),0) as stockValue FROM products').get()
 
   // Recent sales with product name
-  const recentSales = db.prepare(`SELECT s.*, p.name as product_name FROM sales s LEFT JOIN products p ON s.product_id = p.id ORDER BY s.date DESC LIMIT 5`).all()
+  const recentSales = db.prepare(`SELECT s.*, p.name as product_name FROM sales s LEFT JOIN products p ON s.product_id = p.id ORDER BY s.date DESC LIMIT 50`).all()
 
   const r2 = v => Math.round(Number(v) * 100) / 100
   const costIndicator = r2(salesAgg.totalSales - salesAgg.totalProfit)

@@ -11,7 +11,7 @@ function Card({ title, value }) {
 }
 
 export default function Dashboard() {
-  const [filters, setFilters] = useState({ range: 'today', start: '', end: '' })
+  const [filters, setFilters] = useState({ range: 'all', start: '', end: '' })
   const [data, setData] = useState(null)
 
   function getDateParams() {
@@ -60,6 +60,7 @@ export default function Dashboard() {
       <h1>Tableau de bord</h1>
       <div className="filters">
         <select value={filters.range} onChange={e => setFilters({ ...filters, range: e.target.value })}>
+          <option value="all">Toutes les ventes</option>
           <option value="today">Aujourd'hui</option>
           <option value="yesterday">Hier</option>
           <option value="week">Cette semaine</option>
