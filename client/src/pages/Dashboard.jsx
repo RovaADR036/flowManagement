@@ -83,11 +83,12 @@ export default function Dashboard() {
         <h2>Ventes récentes</h2>
         {data?.recentSales?.length ? (
           <table className="table">
-            <thead><tr><th>Date</th><th>Produit</th><th>Qté</th><th>Total</th><th>Profit</th></tr></thead>
+            <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qté</th><th>Total</th><th>Profit</th></tr></thead>
             <tbody>
               {data.recentSales.map(s => (
                 <tr key={s.id}>
                   <td>{new Date(s.date).toLocaleDateString('fr-FR')}</td>
+                  <td>{s.customer_name || 'Client'}</td>
                   <td>{s.product_name}</td>
                   <td>{Number(s.quantity).toFixed(2)}</td>
                   <td>{fmt(s.total_price)}</td>

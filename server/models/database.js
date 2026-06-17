@@ -23,6 +23,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
+    customer_name TEXT DEFAULT 'Client',
     quantity REAL NOT NULL,
     unit_price REAL NOT NULL,
     unit_cost REAL NOT NULL,
@@ -32,6 +33,12 @@ db.exec(`
     FOREIGN KEY (product_id) REFERENCES products(id)
   );
 `)
+
+// Add customer_name column if upgrading from old schema
+const cols = db.prepare("PRAGMA table_info(sales)").all()
+if (!cols.find(c => c.name === 'customer_name')) {
+  db.exec("ALTER TABLE sales ADD COLUMN customer_name TEXT DEFAULT 'Client'")
+}
 
 // Seed data if empty
 const count = db.prepare('SELECT COUNT(*) as c FROM products').get()

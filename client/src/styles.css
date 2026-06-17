@@ -55,6 +55,18 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .top-meta { font-size: 0.75em; color: #888; }
 .top-list .empty { color: #666; font-style: italic; justify-content: center; }
 @media (max-width: 768px) { .sales-layout { flex-direction: column; } .top-sidebar { width: 100%; } }
+.invoice-group { margin-bottom: 20px; border: 1px solid #2a3050; border-radius: 8px; overflow: hidden; }
+.invoice-header { background: #1a2245; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+.invoice-client { font-weight: bold; color: #6af; font-size: 1.05em; }
+.invoice-total { font-size: 0.9em; color: #aaa; }
+.invoice-group .table { margin-top: 0; border: none; }
+.sales-main .empty { color: #666; font-style: italic; padding: 20px; text-align: center; }
+.cart-card { margin-top: 16px; border: 1px solid #3a8dff; }
+.cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cart-header h3 { margin: 0; }
+.cart-summary { font-size: 0.9em; color: #aaa; }
+.btn-finalize { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 1em; margin-top: 10px; width: 100%; }
+.btn-finalize:hover { background: #218838; }
 .action-group { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 .add-stock { display: inline-flex; gap: 3px; align-items: center; }
 .add-stock input { width: 60px; padding: 4px; }
