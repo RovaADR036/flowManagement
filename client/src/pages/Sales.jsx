@@ -10,6 +10,7 @@ export default function Sales() {
   const [cart, setCart] = useState([])
   const [sales, setSales] = useState([])
   const [message, setMessage] = useState(null)
+  const [amountReceived, setAmountReceived] = useState('')
 
   const headers = { Authorization: 'Bearer placeholder' }
   const API = 'http://localhost:5000/api'
@@ -91,6 +92,7 @@ export default function Sales() {
       setMessage(`Vente finalisée pour ${name} ✓`)
       setCart([])
       setCustomerName('')
+      setAmountReceived('')
       load()
     } catch (e) {
       setMessage(e.response?.data?.error || 'Erreur lors de la finalisation')
@@ -174,7 +176,30 @@ export default function Sales() {
               ))}
             </tbody>
           </table>
-          <button className="btn-finalize" onClick={finalizeSale}>
+
+          <div className="payment-section">
+            <div className="payment-row">
+              <span>Total à payer :</span>
+              <strong>{cartTotal.toFixed(2)} Ar</strong>
+            </div>
+            <div className="payment-row">
+              <label>Montant reçu :</label>
+              <input type="number" min="0" step="any" value={amountReceived} onChange={e => setAmountReceived(e.target.value)} placeholder="0" />
+            </div>
+            {Number(amountReceived) >= cartTotal ? (
+              <div className="payment-row change-row">
+                <span>Reste à rendre :</span>
+                <strong className="change-value">{(Number(amountReceived) - cartTotal).toFixed(2)} Ar</strong>
+              </div>
+            ) : amountReceived ? (
+              <div className="payment-row change-row insufficient">
+                <span>Il manque :</span>
+                <strong>{(cartTotal - Number(amountReceived)).toFixed(2)} Ar</strong>
+              </div>
+            ) : null}
+          </div>
+
+          <button className="btn-finalize" onClick={finalizeSale} disabled={Number(amountReceived) < cartTotal}>
             Finaliser la vente ({cart.length} article{cart.length > 1 ? 's' : ''})
           </button>
         </div>
