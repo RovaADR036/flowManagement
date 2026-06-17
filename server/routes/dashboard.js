@@ -25,15 +25,16 @@ router.get('/dashboard', ensureAuth, (req, res) => {
   // Recent sales with product name
   const recentSales = db.prepare(`SELECT s.*, p.name as product_name FROM sales s LEFT JOIN products p ON s.product_id = p.id ORDER BY s.date DESC LIMIT 5`).all()
 
-  const costIndicator = salesAgg.totalSales - salesAgg.totalProfit
+  const r2 = v => Math.round(Number(v) * 100) / 100
+  const costIndicator = r2(salesAgg.totalSales - salesAgg.totalProfit)
 
   res.json({
-    totalSales: salesAgg.totalSales,
-    totalProfit: salesAgg.totalProfit,
-    stockValue: stockRow.stockValue,
+    totalSales: r2(salesAgg.totalSales),
+    totalProfit: r2(salesAgg.totalProfit),
+    stockValue: r2(stockRow.stockValue),
     costIndicator,
-    totalSoldUnits: salesAgg.totalSoldUnits,
-    recentSales
+    totalSoldUnits: r2(salesAgg.totalSoldUnits),
+    recentSales: recentSales.map(s => ({ ...s, total_price: r2(s.total_price), profit: r2(s.profit) }))
   })
 })
 

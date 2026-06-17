@@ -89,7 +89,7 @@ export default function Dashboard() {
                 <tr key={s.id}>
                   <td>{new Date(s.date).toLocaleDateString('fr-FR')}</td>
                   <td>{s.product_name}</td>
-                  <td>{s.quantity}</td>
+                  <td>{Number(s.quantity).toFixed(2)}</td>
                   <td>{fmt(s.total_price)}</td>
                   <td>{fmt(s.profit)}</td>
                 </tr>

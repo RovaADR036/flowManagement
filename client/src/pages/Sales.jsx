@@ -19,7 +19,7 @@ export default function Sales() {
     setQty(val)
     setLastEdited('qty')
     if (selectedProduct && val) {
-      setAmount((Number(val) * selectedProduct.sale_price).toFixed(2))
+      setAmount(String(Number(val) * selectedProduct.sale_price))
     } else {
       setAmount('')
     }
@@ -29,7 +29,7 @@ export default function Sales() {
     setAmount(val)
     setLastEdited('amount')
     if (selectedProduct && val && selectedProduct.sale_price > 0) {
-      setQty((Number(val) / selectedProduct.sale_price).toFixed(4))
+      setQty(String(Number(val) / selectedProduct.sale_price))
     } else {
       setQty('')
     }
@@ -77,7 +77,7 @@ export default function Sales() {
             <option value="">Sélectionner un produit</option>
             {products.map(p => (
               <option key={p.id} value={p.id}>
-                {p.name} — {p.sale_price} Ar/{p.unit || 'pièce'} (stock: {p.stock})
+                {p.name} — {Number(p.sale_price).toFixed(2)} Ar/{p.unit || 'pièce'} (stock: {p.stock})
               </option>
             ))}
           </select>
@@ -94,7 +94,7 @@ export default function Sales() {
                 <input type="number" min="0" step="any" value={amount} onChange={e => onAmountChange(e.target.value)} />
               </div>
               <div className="sale-info">
-                Prix unitaire : <strong>{selectedProduct.sale_price} Ar/{selectedProduct.unit || 'pièce'}</strong>
+                Prix unitaire : <strong>{Number(selectedProduct.sale_price).toFixed(2)} Ar/{selectedProduct.unit || 'pièce'}</strong>
                 {qty && amount && <span> | Total vente : <strong>{Number(amount).toFixed(2)} Ar</strong></span>}
               </div>
             </>
@@ -121,10 +121,10 @@ export default function Sales() {
                   <td>{new Date(s.date).toLocaleDateString('fr-FR')}</td>
                   <td>{prod.name}</td>
                   <td>{prod.unit || 'pièce'}</td>
-                  <td>{s.quantity}</td>
-                  <td>{s.unit_price} Ar</td>
-                  <td>{s.total_price.toFixed(2)} Ar</td>
-                  <td>{s.profit.toFixed(2)} Ar</td>
+                  <td>{Number(s.quantity).toFixed(2)}</td>
+                  <td>{Number(s.unit_price).toFixed(2)} Ar</td>
+                  <td>{Number(s.total_price).toFixed(2)} Ar</td>
+                  <td>{Number(s.profit).toFixed(2)} Ar</td>
                 </tr>
               )
             })}

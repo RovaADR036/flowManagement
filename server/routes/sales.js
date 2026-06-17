@@ -22,13 +22,14 @@ router.post('/sales', authorize, (req, res) => {
   if (!product) return res.status(404).json({ error: 'Product not found' })
   if (product.stock < qty) return res.status(400).json({ error: 'Not enough stock' })
 
+  const r2 = v => Math.round(v * 100) / 100
   const sale = saleModel.add({
     product_id: pid,
     quantity: qty,
-    unit_price: product.sale_price,
-    unit_cost: product.purchase_price,
-    total_price: product.sale_price * qty,
-    profit: (product.sale_price - product.purchase_price) * qty
+    unit_price: r2(product.sale_price),
+    unit_cost: r2(product.purchase_price),
+    total_price: r2(product.sale_price * qty),
+    profit: r2((product.sale_price - product.purchase_price) * qty)
   })
   res.status(201).json(sale)
 })

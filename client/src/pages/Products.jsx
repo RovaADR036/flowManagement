@@ -118,7 +118,7 @@ export default function Products() {
                   <td><input type="number" step="0.01" value={editForm.sale_price} onChange={e => setEditForm({ ...editForm, sale_price: e.target.value })} /></td>
                   <td><input type="number" value={editForm.stock} onChange={e => setEditForm({ ...editForm, stock: e.target.value })} /></td>
                   <td>{p.sold}</td>
-                  <td>{Number(editForm.sale_price) - Number(editForm.purchase_price)} Ar</td>
+                  <td>{(Number(editForm.sale_price) - Number(editForm.purchase_price)).toFixed(2)} Ar</td>
                   <td>
                     <button onClick={() => saveEdit(p.id)}>Sauvegarder</button>
                     <button className="btn-secondary" onClick={cancelEdit}>Annuler</button>
@@ -128,11 +128,11 @@ export default function Products() {
                 <>
                   <td>{p.name}</td>
                   <td>{p.unit || 'pièce'}</td>
-                  <td>{p.purchase_price} Ar</td>
-                  <td>{p.sale_price} Ar</td>
+                  <td>{Number(p.purchase_price).toFixed(2)} Ar</td>
+                  <td>{Number(p.sale_price).toFixed(2)} Ar</td>
                   <td>{p.stock}</td>
                   <td>{p.sold}</td>
-                  <td>{p.sale_price - p.purchase_price} Ar</td>
+                  <td>{(p.sale_price - p.purchase_price).toFixed(2)} Ar</td>
                   <td>
                     <div className="action-group">
                       <button onClick={() => startEdit(p)}>Modifier</button>
