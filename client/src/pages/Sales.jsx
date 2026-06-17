@@ -6,7 +6,7 @@ export default function Sales() {
   const [productId, setProductId] = useState('')
   const [qty, setQty] = useState('')
   const [amount, setAmount] = useState('')
-  const [lastEdited, setLastEdited] = useState(null) // 'qty' or 'amount'
+  const [lastEdited, setLastEdited] = useState(null)
   const [sales, setSales] = useState([])
   const [message, setMessage] = useState(null)
 
@@ -14,6 +14,14 @@ export default function Sales() {
   const API = 'http://localhost:5000/api'
 
   const selectedProduct = products.find(p => p.id === Number(productId))
+
+  // Count how many times each product appears in sales rows
+  const saleCounts = {}
+  sales.forEach(s => { saleCounts[s.product_id] = (saleCounts[s.product_id] || 0) + 1 })
+  const topProducts = [...products]
+    .map(p => ({ ...p, saleCount: saleCounts[p.id] || 0 }))
+    .filter(p => p.saleCount > 0)
+    .sort((a, b) => b.saleCount - a.saleCount)
 
   function onQtyChange(val) {
     setQty(val)
@@ -104,32 +112,52 @@ export default function Sales() {
         {message && <div className="message">{message}</div>}
       </div>
 
-      <div className="section">
-        <h2>Résumé des ventes</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Date</th><th>Produit</th><th>Unité</th>
-              <th>Qté</th><th>Prix unitaire</th><th>Total</th><th>Profit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sales.map(s => {
-              const prod = products.find(p => p.id === s.product_id) || {}
-              return (
-                <tr key={s.id}>
-                  <td>{new Date(s.date).toLocaleDateString('fr-FR')}</td>
-                  <td>{prod.name}</td>
-                  <td>{prod.unit || 'pièce'}</td>
-                  <td>{Number(s.quantity).toFixed(2)}</td>
-                  <td>{Number(s.unit_price).toFixed(2)} Ar</td>
-                  <td>{Number(s.total_price).toFixed(2)} Ar</td>
-                  <td>{Number(s.profit).toFixed(2)} Ar</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+      <div className="sales-layout">
+        <div className="sales-main">
+          <h2>Résumé des ventes</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Produit</th><th>Unité</th>
+                <th>Qté</th><th>Prix unitaire</th><th>Total</th><th>Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sales.map(s => {
+                const prod = products.find(p => p.id === s.product_id) || {}
+                return (
+                  <tr key={s.id}>
+                    <td>{new Date(s.date).toLocaleDateString('fr-FR')}</td>
+                    <td>{prod.name}</td>
+                    <td>{prod.unit || 'pièce'}</td>
+                    <td>{Number(s.quantity).toFixed(2)}</td>
+                    <td>{Number(s.unit_price).toFixed(2)} Ar</td>
+                    <td>{Number(s.total_price).toFixed(2)} Ar</td>
+                    <td>{Number(s.profit).toFixed(2)} Ar</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <aside className="top-sidebar">
+          <h3>Top produits</h3>
+          <ol className="top-list">
+            {topProducts.map((p, i) => (
+              <li key={p.id}>
+                <span className="top-rank">{i + 1}</span>
+                <div className="top-info">
+                  <strong>{p.name}</strong>
+                  <span className="top-meta">{p.saleCount} vente{p.saleCount > 1 ? 's' : ''}</span>
+                </div>
+              </li>
+            ))}
+            {topProducts.length === 0 && (
+              <li className="empty">Aucune vente pour le moment</li>
+            )}
+          </ol>
+        </aside>
       </div>
     </div>
   )
