@@ -35,7 +35,7 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
 
   // Helper: parse dates, default to all
   const startDate = start ? new Date(start) : null
-  const endDate = end ? new Date(end) : null
+  const endDate = end ? new Date(end + 'T23:59:59.999Z') : null
 
   const filterSales = sales.filter(s => {
     const d = new Date(s.date)
