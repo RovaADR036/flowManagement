@@ -51,7 +51,8 @@ export default function Dashboard() {
   useEffect(() => { fetchData() }, [filters])
 
   function fmt(amount) {
-    return amount?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) ?? '-'
+    if (amount == null) return '-'
+    return Number(amount).toLocaleString('fr-FR') + ' Ar'
   }
 
   return (

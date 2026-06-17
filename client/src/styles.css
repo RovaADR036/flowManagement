@@ -34,3 +34,11 @@ input, select { padding: 8px; border-radius: 6px; border: 1px solid #444; backgr
 input[type="number"] { width: 100px; }
 td input { width: 100%; min-width: 70px; }
 td button + button { margin-left: 6px; }
+.unit-group { display: inline-flex; gap: 4px; align-items: center; }
+.unit-group select { max-width: 110px; }
+.unit-group input { max-width: 100px; }
+.field-group { display: flex; flex-direction: column; gap: 2px; }
+.field-group label { font-size: 0.8em; color: #aaa; }
+.or { padding: 0 8px; color: #888; font-style: italic; align-self: flex-end; padding-bottom: 8px; }
+.sale-info { margin-top: 8px; font-size: 0.92em; color: #ccc; width: 100%; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }

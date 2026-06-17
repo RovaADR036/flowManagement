@@ -3,13 +3,44 @@ import axios from 'axios'
 
 export default function Sales() {
   const [products, setProducts] = useState([])
-  const [qty, setQty] = useState(1)
   const [productId, setProductId] = useState('')
+  const [qty, setQty] = useState('')
+  const [amount, setAmount] = useState('')
+  const [lastEdited, setLastEdited] = useState(null) // 'qty' or 'amount'
   const [sales, setSales] = useState([])
   const [message, setMessage] = useState(null)
 
   const headers = { Authorization: 'Bearer placeholder' }
   const API = 'http://localhost:5000/api'
+
+  const selectedProduct = products.find(p => p.id === Number(productId))
+
+  function onQtyChange(val) {
+    setQty(val)
+    setLastEdited('qty')
+    if (selectedProduct && val) {
+      setAmount((Number(val) * selectedProduct.sale_price).toFixed(2))
+    } else {
+      setAmount('')
+    }
+  }
+
+  function onAmountChange(val) {
+    setAmount(val)
+    setLastEdited('amount')
+    if (selectedProduct && val && selectedProduct.sale_price > 0) {
+      setQty((Number(val) / selectedProduct.sale_price).toFixed(4))
+    } else {
+      setQty('')
+    }
+  }
+
+  function onProductChange(id) {
+    setProductId(id)
+    setQty('')
+    setAmount('')
+    setLastEdited(null)
+  }
 
   async function load() {
     const resP = await axios.get(`${API}/products`, { headers })
@@ -19,44 +50,69 @@ export default function Sales() {
   }
 
   async function recordSale() {
-    if (!productId) return
-    const payload = { product_id: Number(productId), quantity: Number(qty) }
+    if (!productId || !qty || Number(qty) <= 0) return
     try {
-      await axios.post(`${API}/sales`, payload, { headers })
-      setMessage('Vente enregistrée')
+      await axios.post(`${API}/sales`, {
+        product_id: Number(productId),
+        quantity: Number(qty)
+      }, { headers })
+      setMessage('Vente enregistrée ✓')
+      onProductChange('')
       load()
     } catch (e) {
-      setMessage('Erreur lors de l\'enregistrement')
+      setMessage(e.response?.data?.error || 'Erreur lors de l\'enregistrement')
     }
   }
 
   useEffect(() => { load() }, [])
 
-  function productLabel(p) {
-    return `${p.name} — ${p.sale_price} €${p.unit ? '/' + p.unit : ''} (stock: ${p.stock})`
-  }
-
   return (
     <div className="page">
       <h1>Gestion des ventes</h1>
+
       <div className="card">
         <h3>Nouvelle vente</h3>
         <div className="row wrap">
-          <select value={productId} onChange={e => setProductId(e.target.value)}>
+          <select value={productId} onChange={e => onProductChange(e.target.value)}>
             <option value="">Sélectionner un produit</option>
             {products.map(p => (
-              <option key={p.id} value={p.id}>{productLabel(p)}</option>
+              <option key={p.id} value={p.id}>
+                {p.name} — {p.sale_price} Ar/{p.unit || 'pièce'} (stock: {p.stock})
+              </option>
             ))}
           </select>
-          <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} />
-          <button onClick={recordSale}>Enregistrer la vente</button>
+
+          {selectedProduct && (
+            <>
+              <div className="field-group">
+                <label>Quantité ({selectedProduct.unit || 'pièce'})</label>
+                <input type="number" min="0" step="any" value={qty} onChange={e => onQtyChange(e.target.value)} />
+              </div>
+              <span className="or">ou</span>
+              <div className="field-group">
+                <label>Montant (Ar)</label>
+                <input type="number" min="0" step="any" value={amount} onChange={e => onAmountChange(e.target.value)} />
+              </div>
+              <div className="sale-info">
+                Prix unitaire : <strong>{selectedProduct.sale_price} Ar/{selectedProduct.unit || 'pièce'}</strong>
+                {qty && amount && <span> | Total vente : <strong>{Number(amount).toFixed(2)} Ar</strong></span>}
+              </div>
+            </>
+          )}
         </div>
+        <button onClick={recordSale} disabled={!qty || Number(qty) <= 0}>Enregistrer la vente</button>
         {message && <div className="message">{message}</div>}
       </div>
+
       <div className="section">
         <h2>Résumé des ventes</h2>
         <table className="table">
-          <thead><tr><th>Date</th><th>Produit</th><th>Unité</th><th>Qté</th><th>Total</th><th>Profit</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Date</th><th>Produit</th><th>Unité</th>
+              <th>Qté</th><th>Prix unitaire</th><th>Total</th><th>Profit</th>
+            </tr>
+          </thead>
           <tbody>
             {sales.map(s => {
               const prod = products.find(p => p.id === s.product_id) || {}
@@ -66,8 +122,9 @@ export default function Sales() {
                   <td>{prod.name}</td>
                   <td>{prod.unit || 'pièce'}</td>
                   <td>{s.quantity}</td>
-                  <td>{s.total_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
-                  <td>{s.profit.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+                  <td>{s.unit_price} Ar</td>
+                  <td>{s.total_price.toFixed(2)} Ar</td>
+                  <td>{s.profit.toFixed(2)} Ar</td>
                 </tr>
               )
             })}

@@ -50,6 +50,21 @@ export default function Products() {
 
   useEffect(() => { load() }, [])
 
+  function UnitSelect({ value, onChange }) {
+    const isCustom = value && !UNITS.includes(value)
+    return (
+      <span className="unit-group">
+        <select value={isCustom ? 'autre' : value} onChange={e => {
+          onChange(e.target.value === 'autre' ? '' : e.target.value)
+        }}>
+          {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+          <option value="autre">Autre…</option>
+        </select>
+        {isCustom && <input placeholder="Unité perso" value={value} onChange={e => onChange(e.target.value)} />}
+      </span>
+    )
+  }
+
   return (
     <div className="page">
       <h1>Gestion des produits</h1>
@@ -59,10 +74,7 @@ export default function Products() {
         {error && <div className="error">{error}</div>}
         <div className="row wrap">
           <input placeholder="Nom" value={newProd.name} onChange={e => setNewProd({ ...newProd, name: e.target.value })} />
-          <input list="unit-list" placeholder="Unité" value={newProd.unit} onChange={e => setNewProd({ ...newProd, unit: e.target.value })} />
-          <datalist id="unit-list">
-            {UNITS.map(u => <option key={u} value={u} />)}
-          </datalist>
+          <UnitSelect value={newProd.unit} onChange={v => setNewProd({ ...newProd, unit: v })} />
           <input placeholder="Prix achat" type="number" step="0.01" value={newProd.purchase_price} onChange={e => setNewProd({ ...newProd, purchase_price: e.target.value })} />
           <input placeholder="Prix vente" type="number" step="0.01" value={newProd.sale_price} onChange={e => setNewProd({ ...newProd, sale_price: e.target.value })} />
           <input placeholder="Stock" type="number" value={newProd.stock} onChange={e => setNewProd({ ...newProd, stock: e.target.value })} />
@@ -89,14 +101,12 @@ export default function Products() {
               {editingId === p.id ? (
                 <>
                   <td><input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} /></td>
-                  <td>
-                    <input list="unit-list" value={editForm.unit} onChange={e => setEditForm({ ...editForm, unit: e.target.value })} />
-                  </td>
+                  <td><UnitSelect value={editForm.unit} onChange={v => setEditForm({ ...editForm, unit: v })} /></td>
                   <td><input type="number" step="0.01" value={editForm.purchase_price} onChange={e => setEditForm({ ...editForm, purchase_price: e.target.value })} /></td>
                   <td><input type="number" step="0.01" value={editForm.sale_price} onChange={e => setEditForm({ ...editForm, sale_price: e.target.value })} /></td>
                   <td><input type="number" value={editForm.stock} onChange={e => setEditForm({ ...editForm, stock: e.target.value })} /></td>
                   <td>{p.sold}</td>
-                  <td>{Number(editForm.sale_price) - Number(editForm.purchase_price)} €</td>
+                  <td>{Number(editForm.sale_price) - Number(editForm.purchase_price)} Ar</td>
                   <td>
                     <button onClick={() => saveEdit(p.id)}>Sauvegarder</button>
                     <button className="btn-secondary" onClick={cancelEdit}>Annuler</button>
@@ -106,11 +116,11 @@ export default function Products() {
                 <>
                   <td>{p.name}</td>
                   <td>{p.unit || 'pièce'}</td>
-                  <td>{p.purchase_price} €</td>
-                  <td>{p.sale_price} €</td>
+                  <td>{p.purchase_price} Ar</td>
+                  <td>{p.sale_price} Ar</td>
                   <td>{p.stock}</td>
                   <td>{p.sold}</td>
-                  <td>{p.sale_price - p.purchase_price} €</td>
+                  <td>{p.sale_price - p.purchase_price} Ar</td>
                   <td>
                     <button onClick={() => startEdit(p)}>Modifier</button>
                     <button className="btn-danger" onClick={() => deleteProduct(p.id)}>Supprimer</button>
