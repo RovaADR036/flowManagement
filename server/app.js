@@ -10,7 +10,8 @@ const saleRoutes = require('./routes/sales')
 
 const app = express()
 const PORT = process.env.PORT || 5000
-const db = require('./models/db')
+// Initialize database (creates tables + seeds if empty)
+require('./models/database')
 
 // Basic CORS setup for local development and API access from frontend
 app.use(cors({ origin: true, credentials: true }))
@@ -22,10 +23,8 @@ app.use('/api', dashboardRoutes)
 app.use('/api', productRoutes)
 app.use('/api', saleRoutes)
 
-db.initSeed().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Shop backend listening on http://localhost:${PORT}`)
-  })
+app.listen(PORT, () => {
+  console.log(`Shop backend listening on http://localhost:${PORT}`)
 })
 
 module.exports = app

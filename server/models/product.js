@@ -1,34 +1,37 @@
-const db = require('./db')
-const store = db.getStore()
+const db = require('./database')
 
-async function getAll() {
-  return store.products
+function getAll() {
+  return db.prepare('SELECT * FROM products ORDER BY id').all()
 }
 
-async function addProduct({ name, purchase_price, sale_price, stock }) {
-  const newProduct = {
-    id: store.products.length ? Math.max(...store.products.map(p => p.id)) + 1 : 1,
-    name,
-    purchase_price: Number(purchase_price),
-    sale_price: Number(sale_price),
-    stock: Number(stock),
-    sold: 0
+function getById(id) {
+  return db.prepare('SELECT * FROM products WHERE id = ?').get(id)
+}
+
+function add({ name, unit, purchase_price, sale_price, stock }) {
+  const stmt = db.prepare('INSERT INTO products (name, unit, purchase_price, sale_price, stock) VALUES (?, ?, ?, ?, ?)')
+  const result = stmt.run(name, unit || 'pièce', Number(purchase_price), Number(sale_price), Number(stock))
+  return getById(result.lastInsertRowid)
+}
+
+function update(id, attrs) {
+  const fields = []
+  const values = []
+  const allowed = ['name', 'unit', 'purchase_price', 'sale_price', 'stock']
+  for (const key of allowed) {
+    if (attrs[key] !== undefined && attrs[key] !== null) {
+      fields.push(`${key} = ?`)
+      values.push(key === 'name' || key === 'unit' ? attrs[key] : Number(attrs[key]))
+    }
   }
-  store.products.push(newProduct)
-  return newProduct
+  if (fields.length === 0) return getById(id)
+  values.push(id)
+  db.prepare(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`).run(...values)
+  return getById(id)
 }
 
-async function updateProduct(id, attrs) {
-  const p = store.products.find(p => p.id === id)
-  if (!p) throw new Error('Product not found')
-  Object.assign(p, attrs)
-  return p
+function remove(id) {
+  db.prepare('DELETE FROM products WHERE id = ?').run(id)
 }
 
-async function deleteProduct(id) {
-  const idx = store.products.findIndex(p => p.id === id)
-  if (idx === -1) throw new Error('Product not found')
-  store.products.splice(idx, 1)
-}
-
-module.exports = { getAll, addProduct, updateProduct, deleteProduct }
+module.exports = { getAll, getById, add, update, remove }

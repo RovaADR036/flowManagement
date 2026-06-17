@@ -9,6 +9,8 @@ export default function Products() {
   const [error, setError] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({})
+  const [addStockId, setAddStockId] = useState(null)
+  const [addStockQty, setAddStockQty] = useState('')
 
   const headers = { Authorization: 'Bearer placeholder' }
   const API = 'http://localhost:5000/api'
@@ -45,6 +47,16 @@ export default function Products() {
     await axios.put(`${API}/products/${id}`, editForm, { headers })
     setEditingId(null)
     setEditForm({})
+    load()
+  }
+
+  async function addStock(id) {
+    if (!addStockQty || Number(addStockQty) <= 0) return
+    const p = products.find(p => p.id === id)
+    const newStock = Number(p.stock) + Number(addStockQty)
+    await axios.put(`${API}/products/${id}`, { stock: newStock }, { headers })
+    setAddStockId(null)
+    setAddStockQty('')
     load()
   }
 
@@ -122,8 +134,19 @@ export default function Products() {
                   <td>{p.sold}</td>
                   <td>{p.sale_price - p.purchase_price} Ar</td>
                   <td>
-                    <button onClick={() => startEdit(p)}>Modifier</button>
-                    <button className="btn-danger" onClick={() => deleteProduct(p.id)}>Supprimer</button>
+                    <div className="action-group">
+                      <button onClick={() => startEdit(p)}>Modifier</button>
+                      <button className="btn-danger" onClick={() => deleteProduct(p.id)}>Supprimer</button>
+                      {addStockId === p.id ? (
+                        <span className="add-stock">
+                          <input type="number" min="1" value={addStockQty} onChange={e => setAddStockQty(e.target.value)} placeholder="Qté" />
+                          <button className="btn-success" onClick={() => addStock(p.id)}>OK</button>
+                          <button className="btn-secondary" onClick={() => { setAddStockId(null); setAddStockQty('') }}>X</button>
+                        </span>
+                      ) : (
+                        <button className="btn-stock" onClick={() => { setAddStockId(p.id); setAddStockQty('') }}>Stock +</button>
+                      )}
+                    </div>
                   </td>
                 </>
               )}

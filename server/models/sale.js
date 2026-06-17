@@ -1,23 +1,31 @@
-const db = require('./db')
-const store = db.getStore()
+const db = require('./database')
 
-async function addSale({ product_id, quantity, unit_price, unit_cost, total_price, profit }) {
-  const sale = {
-    id: store.sales.length ? Math.max(...store.sales.map(s => s.id)) + 1 : 1,
-    product_id,
-    quantity,
-    unit_price,
-    unit_cost,
-    total_price,
-    profit,
-    date: new Date().toISOString()
-  }
-  store.sales.push(sale)
-  return sale
+function getAll() {
+  return db.prepare('SELECT * FROM sales ORDER BY date DESC').all()
 }
 
-async function getAll() {
-  return store.sales
+function getRecent(limit = 5) {
+  return db.prepare('SELECT * FROM sales ORDER BY date DESC LIMIT ?').all(limit)
 }
 
-module.exports = { addSale, getAll }
+function getFiltered(startDate, endDate) {
+  let sql = 'SELECT * FROM sales WHERE 1=1'
+  const params = []
+  if (startDate) { sql += ' AND date >= ?'; params.push(startDate) }
+  if (endDate) { sql += ' AND date <= ?'; params.push(endDate) }
+  sql += ' ORDER BY date DESC'
+  return db.prepare(sql).all(...params)
+}
+
+function add({ product_id, quantity, unit_price, unit_cost, total_price, profit }) {
+  const insertSale = db.prepare('INSERT INTO sales (product_id, quantity, unit_price, unit_cost, total_price, profit, date) VALUES (?, ?, ?, ?, ?, ?, ?)')
+  const updateProduct = db.prepare('UPDATE products SET stock = stock - ?, sold = sold + ? WHERE id = ?')
+
+  const date = new Date().toISOString()
+  const result = insertSale.run(product_id, quantity, unit_price, unit_cost, total_price, profit, date)
+  updateProduct.run(quantity, quantity, product_id)
+
+  return db.prepare('SELECT * FROM sales WHERE id = ?').get(result.lastInsertRowid)
+}
+
+module.exports = { getAll, getRecent, getFiltered, add }
