@@ -253,15 +253,19 @@ export default function Sales() {
         <aside className="top-sidebar">
           <h3>Top produits</h3>
           <ol className="top-list">
-            {topProducts.map((p, i) => (
-              <li key={p.id}>
-                <span className="top-rank">{i + 1}</span>
-                <div className="top-info">
-                  <strong>{p.name}</strong>
-                  <span className="top-meta">{p.saleCount} vente{p.saleCount > 1 ? 's' : ''}</span>
-                </div>
-              </li>
-            ))}
+            {topProducts.map((p, i) => {
+              const badge = p.stock <= 0 ? '🔴 Rupture' : p.stock <= (p.min_stock || 5) ? '🟠 Stock bas' : null
+              return (
+                <li key={p.id}>
+                  <span className="top-rank">{i + 1}</span>
+                  <div className="top-info">
+                    <strong>{p.name}</strong>
+                    <span className="top-meta">{p.saleCount} vente{p.saleCount > 1 ? 's' : ''} | Stock: {p.stock}</span>
+                    {badge && <span className="top-badge">{badge}</span>}
+                  </div>
+                </li>
+              )
+            })}
             {topProducts.length === 0 && (
               <li className="empty">Aucune vente pour le moment</li>
             )}

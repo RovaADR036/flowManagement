@@ -54,6 +54,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .top-info strong { font-size: 0.9em; }
 .top-meta { font-size: 0.75em; color: #888; }
 .top-list .empty { color: #666; font-style: italic; justify-content: center; }
+.top-badge { font-size: 0.7em; color: #ff9800; margin-top: 2px; }
 @media (max-width: 768px) { .sales-layout { flex-direction: column; } .top-sidebar { width: 100%; } }
 .invoice-group { margin-bottom: 20px; border: 1px solid #2a3050; border-radius: 8px; overflow: hidden; }
 .invoice-header { background: #1a2245; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
