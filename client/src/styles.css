@@ -82,3 +82,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .add-stock input { width: 60px; padding: 4px; }
 .btn-stock { background: #28a745; color: white; padding: 4px 8px; font-size: 0.85em; }
 .btn-success { background: #28a745; }
+.badge { display: inline-block; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: bold; vertical-align: middle; }
+.badge-warning { background: #ff9800; color: #000; }
+.badge-danger { background: #f44336; color: #fff; }
+.row-warning { background: rgba(255, 152, 0, 0.1); }
+.stock-warning { color: #ff9800; font-size: 0.85em; margin-top: 4px; width: 100%; }

@@ -8,16 +8,16 @@ function getById(id) {
   return db.prepare('SELECT * FROM products WHERE id = ?').get(id)
 }
 
-function add({ name, unit, purchase_price, sale_price, stock }) {
-  const stmt = db.prepare('INSERT INTO products (name, unit, purchase_price, sale_price, stock) VALUES (?, ?, ?, ?, ?)')
-  const result = stmt.run(name, unit || 'pièce', Number(purchase_price), Number(sale_price), Number(stock))
+function add({ name, unit, purchase_price, sale_price, stock, min_stock }) {
+  const stmt = db.prepare('INSERT INTO products (name, unit, purchase_price, sale_price, stock, min_stock) VALUES (?, ?, ?, ?, ?, ?)')
+  const result = stmt.run(name, unit || 'pièce', Number(purchase_price), Number(sale_price), Number(stock), min_stock != null ? Number(min_stock) : 5)
   return getById(result.lastInsertRowid)
 }
 
 function update(id, attrs) {
   const fields = []
   const values = []
-  const allowed = ['name', 'unit', 'purchase_price', 'sale_price', 'stock']
+  const allowed = ['name', 'unit', 'purchase_price', 'sale_price', 'stock', 'min_stock']
   for (const key of allowed) {
     if (attrs[key] !== undefined && attrs[key] !== null) {
       fields.push(`${key} = ?`)

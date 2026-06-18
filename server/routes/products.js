@@ -12,11 +12,11 @@ router.get('/products', authorize, (req, res) => {
 })
 
 router.post('/products', authorize, (req, res) => {
-  const { name, unit, purchase_price, sale_price, stock } = req.body
+  const { name, unit, purchase_price, sale_price, stock, min_stock } = req.body
   if (!name || purchase_price == null || sale_price == null || stock == null) {
     return res.status(400).json({ error: 'Missing fields' })
   }
-  const product = productModel.add({ name, unit, purchase_price, sale_price, stock })
+  const product = productModel.add({ name, unit, purchase_price, sale_price, stock, min_stock })
   res.status(201).json(product)
 })
 

@@ -17,7 +17,8 @@ db.exec(`
     purchase_price REAL NOT NULL,
     sale_price REAL NOT NULL,
     stock INTEGER DEFAULT 0,
-    sold INTEGER DEFAULT 0
+    sold INTEGER DEFAULT 0,
+    min_stock INTEGER DEFAULT 5
   );
 
   CREATE TABLE IF NOT EXISTS sales (
@@ -34,19 +35,23 @@ db.exec(`
   );
 `)
 
-// Add customer_name column if upgrading from old schema
-const cols = db.prepare("PRAGMA table_info(sales)").all()
-if (!cols.find(c => c.name === 'customer_name')) {
+// Add columns if upgrading from old schema
+const pcols = db.prepare("PRAGMA table_info(products)").all()
+if (!pcols.find(c => c.name === 'min_stock')) {
+  db.exec("ALTER TABLE products ADD COLUMN min_stock INTEGER DEFAULT 5")
+}
+const scols = db.prepare("PRAGMA table_info(sales)").all()
+if (!scols.find(c => c.name === 'customer_name')) {
   db.exec("ALTER TABLE sales ADD COLUMN customer_name TEXT DEFAULT 'Client'")
 }
 
 // Seed data if empty
 const count = db.prepare('SELECT COUNT(*) as c FROM products').get()
 if (count.c === 0) {
-  const insert = db.prepare('INSERT INTO products (name, unit, purchase_price, sale_price, stock) VALUES (?, ?, ?, ?, ?)')
-  insert.run('Produit A', 'pièce', 10, 20, 50)
-  insert.run('Produit B', 'litre', 5, 12, 30)
-  insert.run('Produit C', 'kg', 8, 15, 20)
+  const insert = db.prepare('INSERT INTO products (name, unit, purchase_price, sale_price, stock, min_stock) VALUES (?, ?, ?, ?, ?, ?)')
+  insert.run('Produit A', 'pièce', 10, 20, 50, 10)
+  insert.run('Produit B', 'litre', 5, 12, 30, 5)
+  insert.run('Produit C', 'kg', 8, 15, 20, 3)
   console.log('Database seeded with sample products')
 }
 

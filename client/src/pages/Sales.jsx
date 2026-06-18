@@ -143,6 +143,9 @@ export default function Sales() {
                 Prix unitaire : <strong>{Number(selectedProduct.sale_price).toFixed(2)} Ar/{selectedProduct.unit || 'pièce'}</strong>
                 {qty && amount && <span> | Total ligne : <strong>{Number(amount).toFixed(2)} Ar</strong></span>}
               </div>
+              {selectedProduct.stock <= (selectedProduct.min_stock || 5) && (
+                <div className="stock-warning">⚠ Stock bas ({selectedProduct.stock} {selectedProduct.unit || 'pièce'})</div>
+              )}
             </>
           )}
         </div>
