@@ -78,6 +78,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .profit-footer { position: fixed; bottom: 0; left: 200px; right: 0; background: linear-gradient(135deg, #1a2245, #2a3a6a); border-top: 2px solid #6af; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 100; font-size: 1.1em; }
 .profit-label { color: #aaa; font-weight: bold; }
 .profit-value { color: #4caf50; font-size: 1.3em; font-weight: bold; }
+.profit-value.revenue { color: #f9a825; }
 .action-group { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 .add-stock { display: inline-flex; gap: 3px; align-items: center; }
 .add-stock input { width: 60px; padding: 4px; }
@@ -88,3 +89,19 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge-danger { background: #f44336; color: #fff; }
 .row-warning { background: rgba(255, 152, 0, 0.1); }
 .stock-warning { color: #ff9800; font-size: 0.85em; margin-top: 4px; width: 100%; }
+.search-group { position: relative; flex: 1; min-width: 200px; }
+.search-group input { width: 100%; font-size: 1.05em; }
+.search-results { position: absolute; top: 100%; left: 0; right: 0; background: #1a2245; border: 1px solid #2a3050; border-radius: 0 0 6px 6px; z-index: 50; max-height: 300px; overflow-y: auto; }
+.search-item { display: flex; gap: 10px; align-items: center; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #2a3050; }
+.search-item:last-child { border-bottom: none; }
+.search-item.selected, .search-item:hover { background: #2a3a6a; }
+.search-name { flex: 1; font-weight: bold; }
+.search-price { color: #6af; font-size: 0.9em; }
+.search-stock { color: #888; font-size: 0.8em; }
+.search-alert { color: #ff9800; }
+.recent-clients { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.chip { background: #2a3a6a; color: #ccc; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 0.8em; }
+.chip:hover { background: #3a5a9a; color: #fff; }
+.btn-add { background: #3a8dff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 1em; margin-top: 8px; }
+.btn-add:hover { background: #2a7def; }
+.btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
